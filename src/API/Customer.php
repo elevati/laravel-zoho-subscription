@@ -10,6 +10,7 @@ namespace Boparaiamrit\ZohoSubscription\API;
  */
 class Customer extends Base
 {
+
     /**
      * @param string $customerEmail
      *
@@ -18,7 +19,7 @@ class Customer extends Base
     public function getListCustomersByEmail(string $customerEmail): array
     {
         $cacheKey = sprintf('zoho_customer_%s', md5($customerEmail));
-        $hit      = $this->getFromCache($cacheKey);
+        $hit = $this->getFromCache($cacheKey);
 
         if (false === $hit) {
             $response = $this->sendRequest('GET', sprintf('customers?email=%s', $customerEmail));
@@ -61,11 +62,11 @@ class Customer extends Base
     public function getCustomerById(string $customerId): array
     {
         $cacheKey = sprintf('zoho_customer_%s', $customerId);
-        $hit      = $this->getFromCache($cacheKey);
+        $hit = $this->getFromCache($cacheKey);
 
         if (false === $hit) {
             $response = $this->sendRequest('GET', sprintf('customers/%s', $customerId));
-            $result   = $response;
+            $result = $response;
 
             $customer = $result['customer'];
 
@@ -135,4 +136,59 @@ class Customer extends Base
             return false;
         }
     }
+
+    /**
+     * @param string $customerId The customer's id
+     *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function createCard(string $customerId, array $data)
+    {
+        $cacheKey = sprintf('zoho_cards_%s', $customerId);
+        $hit = $this->getFromCache($cacheKey);
+
+        if (false === $hit) {
+            $response = $this->sendRequest('POST', sprintf('customers/%s/cards', $customerId), ['content-type' => 'application/json'], json_encode($data));
+
+            $result = $response;
+            dump($result);
+            $cards = $result['cards'];
+
+            $this->saveToCache($cacheKey, $cards);
+
+            return $cards;
+        }
+
+        return $hit;
+    }
+
+    /**
+     * @param string $customerId The customer's id
+     *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function listCardsByCustomer(string $customerId)
+    {
+        $cacheKey = sprintf('zoho_cards_%s', $customerId);
+        $hit = $this->getFromCache($cacheKey);
+
+        if (false === $hit) {
+            $response = $this->sendRequest('GET', sprintf('customers/%s/cards', $customerId));
+
+            $result = $response;
+
+            $cards = $result['cards'];
+
+            $this->saveToCache($cacheKey, $cards);
+
+            return $cards;
+        }
+
+        return $hit;
+    }
+
 }

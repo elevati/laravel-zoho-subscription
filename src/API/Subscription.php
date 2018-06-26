@@ -11,6 +11,7 @@ namespace Boparaiamrit\ZohoSubscription\API;
  */
 class Subscription extends Base
 {
+
     const STATUS_UNPAID = 'unpaid';
 
     /**
@@ -81,7 +82,7 @@ class Subscription extends Base
     public function getSubscription(string $subscriptionId)
     {
         $cacheKey = sprintf('zoho_subscription_%s', $subscriptionId);
-        $hit      = $this->getFromCache($cacheKey);
+        $hit = $this->getFromCache($cacheKey);
 
         if (false === $hit) {
             $response = $this->sendRequest('GET', sprintf('subscriptions/%s', $subscriptionId));
@@ -121,20 +122,21 @@ class Subscription extends Base
     public function listSubscriptionsByCustomer(string $customerId)
     {
         $cacheKey = sprintf('zoho_subscriptions_%s', $customerId);
-        $hit      = $this->getFromCache($cacheKey);
+        $hit = $this->getFromCache($cacheKey);
 
         if (false === $hit) {
-            $response = $this->sendRequest('GET', sprintf('subscriptions?customer_id=%s', $customerId));
+            $response = $this->sendRequest('GET', sprintf('subscriptions?filter_by=SubscriptionStatus.ACTIVE&customer_id=%s', $customerId));
 
             $result = $response;
 
-            $invoices = $result['subscriptions'];
+            $subscriptions = $result['subscriptions'];
 
-            $this->saveToCache($cacheKey, $invoices);
+            $this->saveToCache($cacheKey, $subscriptions);
 
-            return $invoices;
+            return $subscriptions;
         }
 
         return $hit;
     }
+
 }

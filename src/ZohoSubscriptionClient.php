@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 
 class ZohoSubscriptionClient
 {
+
     protected $passThrough = [
         'subscription',
         'plan',
@@ -28,11 +29,11 @@ class ZohoSubscriptionClient
 
     public function __construct($token, $organizationId, $Cache, $ttl = 7200)
     {
-        $this->token          = $token;
+        $this->token = $token;
         $this->organizationId = $organizationId;
-        $this->Cache          = $Cache;
-        $this->ttl            = $ttl;
-        $this->Client         = new Client(['base_uri' => 'https://subscriptions.zoho.com/api/v1/', 'timeout' => 300]);
+        $this->Cache = $Cache;
+        $this->ttl = $ttl;
+        $this->Client = new Client(['base_uri' => 'https://subscriptions.zoho.com/api/v1/', 'timeout' => 300]);
     }
 
     public function subscription()
@@ -64,4 +65,5 @@ class ZohoSubscriptionClient
     {
         return new HostedPage($this->token, $this->organizationId, $this->Cache);
     }
+
 }
