@@ -111,6 +111,9 @@ class Customer extends Base
         $cacheKey = sprintf('zoho_customer_%s', $customer['customer_id']);
         $this->deleteCacheByKey($cacheKey);
 
+        $cacheKey = sprintf('zoho_cards_%s', $customer['customer_id']);
+        $this->deleteCacheByKey($cacheKey);
+
         $cacheKey = sprintf('zoho_customer_%s', md5($customer['email']));
         $this->deleteCacheByKey($cacheKey);
     }
@@ -146,22 +149,13 @@ class Customer extends Base
      */
     public function createCard(string $customerId, array $data)
     {
-        $cacheKey = sprintf('zoho_cards_%s', $customerId);
-        $hit = $this->getFromCache($cacheKey);
+        $response = $this->sendRequest('POST', sprintf('customers/%s/cards', $customerId), ['content-type' => 'application/json'], json_encode($data));
 
-        if (false === $hit) {
-            $response = $this->sendRequest('POST', sprintf('customers/%s/cards', $customerId), ['content-type' => 'application/json'], json_encode($data));
+        $result = $response;
 
-            $result = $response;
+        $cards = $result['card'];
 
-            $cards = $result['card'];
-
-            $this->saveToCache($cacheKey, $cards);
-
-            return $cards;
-        }
-
-        return $hit;
+        return $cards;
     }
 
     /**

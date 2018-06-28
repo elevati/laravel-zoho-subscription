@@ -28,6 +28,9 @@ class Subscription extends Base
         $cacheKey = sprintf('zoho_subscriptions_%s', $data['customer_id']);
         $this->deleteCacheByKey($cacheKey);
 
+        $cacheKey = sprintf('zoho_cards_%s', $data['customer_id']);
+        $this->deleteCacheByKey($cacheKey);
+
         return $response;
     }
 
