@@ -153,8 +153,8 @@ class Customer extends Base
             $response = $this->sendRequest('POST', sprintf('customers/%s/cards', $customerId), ['content-type' => 'application/json'], json_encode($data));
 
             $result = $response;
-            dump($result);
-            $cards = $result['cards'];
+
+            $cards = $result['card'];
 
             $this->saveToCache($cacheKey, $cards);
 
@@ -186,6 +186,32 @@ class Customer extends Base
             $this->saveToCache($cacheKey, $cards);
 
             return $cards;
+        }
+
+        return $hit;
+    }
+
+    /**
+     * List all payment transactions
+     *
+     * @param string $customerId
+     * @return array
+     */
+    public function listTransactions(string $customerId)
+    {
+        $cacheKey = sprintf('zoho_transaction_%s', $customerId);
+        $hit = $this->getFromCache($cacheKey);
+
+        if (false === $hit) {
+            $response = $this->sendRequest('GET', sprintf('transactions?filter_by=TransactionType.All&customer_id=%s', $customerId));
+
+            $result = $response;
+
+            $transactions = $result['transactions'];
+
+            $this->saveToCache($cacheKey, $transactions);
+
+            return $transactions;
         }
 
         return $hit;

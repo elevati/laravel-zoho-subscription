@@ -25,6 +25,9 @@ class Subscription extends Base
     {
         $response = $this->sendRequest('POST', 'subscriptions', ['content-type' => 'application/json'], json_encode($data));
 
+        $cacheKey = sprintf('zoho_subscriptions_%s', $data['customer_id']);
+        $this->deleteCacheByKey($cacheKey);
+
         return $response;
     }
 
@@ -137,6 +140,32 @@ class Subscription extends Base
         }
 
         return $hit;
+    }
+
+    /**
+     * Cancel Subscription at end of the term
+     *
+     * @param int $customerId
+     * @return boolean
+     */
+    public function cancelAll(int $customerId)
+    {
+        $result = false;
+
+        $currentSubscriptions = $this->listSubscriptionsByCustomer($customerId);
+        foreach ($currentSubscriptions as $subscription) {
+            if ($subscription['status'] == 'live') {
+                $response = $this->sendRequest('POST', sprintf('subscriptions/%s/cancel?cancel_at_end=true', $subscription['subscription_id']));
+                if ($response['code'] == 0) {
+                    $result = true;
+                }
+            }
+        }
+
+        $cacheKey = sprintf('zoho_subscriptions_%s', $customerId);
+        $this->deleteCacheByKey($cacheKey);
+
+        return $result;
     }
 
 }
