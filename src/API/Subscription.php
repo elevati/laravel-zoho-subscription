@@ -159,7 +159,7 @@ class Subscription extends Base
 
         $currentSubscriptions = $this->listSubscriptionsByCustomer($customerId);
         foreach ($currentSubscriptions as $subscription) {
-            if ($subscription['status'] == 'live') {
+            if ($subscription['status'] == 'live' || $subscription['status'] == 'non_renewing') {
                 $response = $this->sendRequest('POST', sprintf('subscriptions/%s/cancel?cancel_at_end=%s', $subscription['subscription_id'], $cancelAtEnd));
                 if ($response['code'] == 0) {
                     $result = true;
