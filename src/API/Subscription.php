@@ -149,16 +149,18 @@ class Subscription extends Base
      * Cancel Subscription at end of the term
      *
      * @param int $customerId
+     * @param bool $cancelAtEnd
      * @return boolean
      */
-    public function cancelAll(int $customerId)
+    public function cancelAll(int $customerId, bool $cancelAtEnd = true)
     {
         $result = false;
+        $cancelAtEnd = ($cancelAtEnd) ? 'true' : 'false';
 
         $currentSubscriptions = $this->listSubscriptionsByCustomer($customerId);
         foreach ($currentSubscriptions as $subscription) {
             if ($subscription['status'] == 'live') {
-                $response = $this->sendRequest('POST', sprintf('subscriptions/%s/cancel?cancel_at_end=true', $subscription['subscription_id']));
+                $response = $this->sendRequest('POST', sprintf('subscriptions/%s/cancel?cancel_at_end=%s', $subscription['subscription_id'], $cancelAtEnd));
                 if ($response['code'] == 0) {
                     $result = true;
                 }
